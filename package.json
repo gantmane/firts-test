@@ -1,0 +1,35 @@
+{
+  "name": "firts-test",
+  "version": "1.0.0",
+  "description": "Test",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gantmane/firts-test.git"
+  },
+  "keywords": [
+    "Test",
+    "project"
+  ],
+  "author": "Evgeny Gantman",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gantmane/firts-test/issues"
+  },
+  "homepage": "https://github.com/gantmane/firts-test#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "eslint": "^8.0.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.25.2",
+    "eslint-plugin-prettier": "^4.0.0",
+    "express": "^4.17.1",
+    "knex": "^0.95.11",
+    "lodash": "^4.17.21",
+    "prettier": "^2.4.1",
+    "uuidv4": "^6.2.12"
+  }
+}
