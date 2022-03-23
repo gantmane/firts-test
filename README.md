@@ -1,2 +1,2 @@
 # firts-test
-Test rep 2
+Test rep
