@@ -12,8 +12,8 @@ jobs:
     <<: *defaults
     steps:
       - checkout
-      - run: docker build -t $DOCKER_IMAGE:latest .
-      - run: docker run --build-arg APP_VERSION=$APP_VERSION -d --rm --name node_app $DOCKER_IMAGE:latest
+      - run: docker build --build-arg APP_VERSION=latest -t $DOCKER_IMAGE:latest .
+      - run: docker run -d --rm --name node_app $DOCKER_IMAGE:latest
       - run: docker exec -it node_app node test.js
       - run: docker stop node_app
 
