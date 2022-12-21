@@ -17,7 +17,7 @@ jobs:
           command: npm run build
           name: Build app
       - persist_to_workspace:
-          root: ~/project
+          root: ~/project/firts-test
           paths:
             - .
 
@@ -25,7 +25,7 @@ jobs:
     executor: heroku/default
     steps:
       - attach_workspace:
-          at: ~/project
+          at: ~/project/firts-test
       - heroku/deploy-via-git:
           force: true # force push when pushing to the heroku remote, see: https://devcenter.heroku.com/articles/git
 
