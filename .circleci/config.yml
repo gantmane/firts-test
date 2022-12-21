@@ -14,16 +14,16 @@ orbs:
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/2.0/configuration-reference/#jobs
 jobs:
-  install-node-example:
-    docker:
-      - image: 'cimg/base:stable'
+  test:
+    executor:
+      name: node/default
+      tag: '16.13'
     steps:
       - checkout
-      - node/install:
-          install-yarn: true
-          node-version: '16.13'
-      - run: node --version
+      - node/install-packages
+      - run:
+          command: npm run test
 workflows:
   test_my_app:
     jobs:
-      - install-node-example
+      - test
