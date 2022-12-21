@@ -4,7 +4,7 @@ defaults: &defaults
   machine:
     docker_layer_caching: true
   environment:
-    - APP_VERSION: $CIRCLE_SHA1
+    - APP_VERSION: v.1.$CIRCLE_SHA1
     - DOCKER_IMAGE: testimage
 
 jobs:
