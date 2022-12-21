@@ -1,43 +1,63 @@
-version: 2.1
-orbs:
-  node: circleci/node@5.0.2
-  heroku: circleci/heroku@1.2.6
+version: 2
+
+defaults: &defaults
+  machine:
+    docker_layer_caching: true
+  environment:
+    - APP_VERSION: $CIRCLE_SHA1
 
 jobs:
-  build_and_test:
-    executor: node/default
+  test:
+    <<: *defaults
     steps:
       - checkout
-      - node/install-packages:
-          pkg-manager: npm
-      - run:
-          command: npm run start
-      - run:
-          command: npm run test
-          name: Run tests
-      - run:
-          command: npm run build
-          name: Build app
-      - persist_to_workspace:
-          root: ~/firts-test
-          paths:
-            - .
+      - run: docker build -t $DOCKER_IMAGE:latest .
+      - run: docker run -d --rm --name node_app $DOCKER_IMAGE:latest
+      - run: docker exec -it node_app node test.js
+      - run: docker stop node_app
 
-  deploy: # this can be any name you choose
-    executor: heroku/default
+  publish:
+    <<: *defaults
     steps:
-      - attach_workspace:
-          at: ~/firts-test
-      - heroku/deploy-via-git:
-          force: true # force push when pushing to the heroku remote, see: https://devcenter.heroku.com/articles/git
+      - checkout
+      - run: docker build --build-arg APP_VERSION=$CIRCLE_SHA1 -t $DOCKER_IMAGE:$CIRCLE_SHA1 .
+      - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
+      - run: docker push $DOCKER_IMAGE:$CIRCLE_SHA1
 
+  deploy:
+    <<: *defaults
+    steps:
+      - checkout
+      - run: echo $ID_RSA | base64 -d > id_rsa && chmod 400 id_rsa
+      - run: ssh -i id_rsa core@$VM_IP "IMAGE=$DOCKER_IMAGE:$CIRCLE_SHA1 bash -s" < deploy.sh
+
+  smoke-test:
+    <<: *defaults
+    steps:
+      - run: |
+          docker run -it \
+                     -e APP_HOST=$VM_IP \
+                     -e APP_VERSION=$CIRCLE_SHA1 \
+                     $DOCKER_IMAGE:$CIRCLE_SHA1 \
+                     node test.js
 workflows:
-  test_my_app:
+  version: 2
+  build-and-deploy:
     jobs:
-      - build_and_test
-      - deploy:
+      - test:
+          context: exoscale
+      - publish:
           requires:
-            - build_and_test # only deploy if the build_and_test job has completed
+            - test
+          context: exoscale
           filters:
             branches:
-              only: main # only deploy when on main
+              only: master
+      - deploy:
+          requires:
+            - publish
+          context: exoscale
+      - smoke-test:
+          requires:
+            - deploy
+          context: exoscale
