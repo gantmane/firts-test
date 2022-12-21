@@ -20,6 +20,15 @@ jobs:
           root: ~/
           paths:
             - .
+  # ...previous job(s)...
+  deploy: # this can be any name you choose
+    executor: heroku/default
+    steps:
+      - attach_workspace:
+          at: ~/project
+      - heroku/deploy-via-git:
+          force: true # force push when pushing to the heroku remote, see: https://devcenter.heroku.com/articles/git
+
 workflows:
   build_test_deploy: # this can be any name you choose
     jobs:
